@@ -6,7 +6,7 @@ Date: May - 21 - 2026
 <h2> Description </h2>
 
 <p>
-In this project, A competitive programming problem was selected in order to demonstrate the use of one of the programming paradigms studied during the TC2037 Computational Methods Implementations) course.
+In this project, a competitive programming problem was selected in order to demonstrate the use of one of the programming paradigms studied during the TC2037 Computational Methods Implementations) course.
 </p>
 
 <p>
@@ -80,7 +80,7 @@ The functional process is based on a sequence of transformations. Each function 
 <h3> Usage of Racket </h3>
 
 <p>
-The solution was implemented in Racket. I chose to implement this solution in Racket because its built-in list handling and function composition make it a natural fit for the functional paradigm."
+The solution was implemented in Racket. I chose to implement this solution in Racket because its built-in list handling and function composition make it a natural fit for the functional paradigm.
 </p>
 
 <h3> Main Functions </h3>
@@ -142,7 +142,7 @@ solution works with different input cases. The tests were written using the func
 different expressions.
 </p>
 
-<h3> Planned Test Cases </h3>
+<h3> Automated Test Cases </h3>
 
 ```racket
 (define (run-tests)
@@ -167,7 +167,7 @@ unordered expressions, repeated numbers, and already sorted inputs.
 
 <h3> Testing Results </h3>
 
-<p> 
+<p>
 After running the automated tests, the following results were obtained:
 </p>
 
