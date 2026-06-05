@@ -10,15 +10,23 @@ In this project, a competitive programming problem was selected in order to demo
 </p>
 
 <p>
-The selected problem is <b>Helpful Maths (339A)</b> from Codeforces. In this problem, the program receives a mathematical expression made with the numbers 1, 2, and 3, separated by plus signs. The objective is not to solve the mathematical sum, but to reorder the numbers from smallest to largest.
+The selected problem is based on <b>Helpful Maths (339A)</b> from Codeforces. The original
+problem receives a mathematical expression made with the numbers 1, 2, and 3 separated
+by plus signs, and the objective is to reorder the numbers from smallest to largest.
 </p>
 
+<p>
+As feedback I got advised that I should extended the original idea by allowing more arithmetic operators:
+addition +, multiplication *, and exponentiation ^.
+Because of this, the program now validates and evaluates a simplified arithmetic
+expression while respecting operator precedence.
+</p>
 <p>
 For example, if the input is:
 </p>
 
 <pre>
-3+2+1
+2^2*3+1
 </pre>
 
 <p>
@@ -26,12 +34,19 @@ The expected output is:
 </p>
 
 <pre>
-1+2+3
+13
 </pre>
 
 <p>
-I chose this problem because it is simple to understand, but it still allows me to show how a programming paradigm changes the way a solution is designed. In this case, the 
-problem can be seen as a transformation process: first the string is divided, then the values are ordered, and finally the expression is built again.
+This result is obtained because exponentiation is evaluated first, then multiplication,
+and finally addition.
+</p>
+
+<p>
+I chose this problem because it started as a simple string transformation problem, but it
+can be extended into a more complete expression-processing problem. In this version, the
+program must validate the expression, split it into numbers and operators, and evaluate
+the operations according to their precedence.
 </p>
 
 <h3> Paradigm </h3>
@@ -52,9 +67,11 @@ In the functional solution, the input is transformed step by step:
 
 <ul>
   <li>The original expression is received as a string.</li>
-  <li>The string is split into a list of values.</li>
-  <li>The list is sorted.</li>
-  <li>The sorted values are joined again using plus signs.</li>
+  <li>The expression is validated to check if its structure is correct.</li>
+  <li>The string is converted into a list of numbers and operators.</li>
+  <li>The program evaluates exponentiation first.</li>
+  <li>Then, it evaluates multiplication.</li>
+  <li>Finally, it evaluates addition.</li>
 </ul>
 
 <p>
@@ -69,68 +86,76 @@ This fits functional programming because the solution is mainly built using func
 The functional process is based on a sequence of transformations. Each function has one clear task and passes its result to the next function.
 </p>
 
-<img width="121" height="421" alt="SolutionDiagram drawio" src="https://github.com/user-attachments/assets/20535e57-0cf6-49cd-aa9e-be6b0e92f0b2" />
-
-<h3>Example Diagram of the Functional Process</h3>
-
-<img width="121" height="421" alt="ExFuncDiagram drawio" src="https://github.com/user-attachments/assets/4dae72f6-36cc-4018-a53c-be7ad69a4271" />
+<img width="121" height="601" alt="DIAGRAMA" src="https://github.com/user-attachments/assets/dadff7fa-97c1-4b53-ab82-33617f750b9b" />
 
 <h2> Implementation </h2>
 
 <h3> Usage of Racket </h3>
 
 <p>
-The solution was implemented in Racket. I chose to implement this solution in Racket because its built-in list handling and function composition make it a natural fit for the functional paradigm.
+The solution was implemented in Racket because the problem can be represented as a
+sequence of data transformations. Racket supports the functional paradigm by allowing the
+program to be divided into small functions that receive data and return new data without
+depending mainly on mutable state.
+</p>
+
+<p>
+In this implementation, the expression is validated, transformed into a list of elements,
+and then evaluated through separated functions according to operator precedence. This
+makes the functional structure of the solution clearer than writing the whole algorithm
+as a sequence of mutable steps.
 </p>
 
 <h3> Main Functions </h3>
 
 <ul>
-  <li><b>parse-expression:</b> separates the input expression using the plus sign.</li>
-  <li><b>sort-values:</b> sorts the values from smallest to largest.</li>
-  <li><b>build-expression:</b> joins the sorted values again with plus signs.</li>
-  <li><b>solve:</b> connects all the previous functions.</li>
+  <li><b>char->num:</b> converts a numeric character into a number.</li>
+  <li><b>operator?:</b> checks if a character is one of the accepted operators.</li>
+  <li><b>valid-char?:</b> checks if a character is valid inside the expression.</li>
+  <li><b>valid-chars?:</b> verifies that all characters in the expression are valid.</li>
+  <li><b>valid-structure?:</b> checks that the expression follows the structure number-operator-number.</li>
+  <li><b>valid-expression?:</b> combines all validation rules.</li>
+  <li><b>split-expression:</b> separates the input expression into numbers and operators.</li>
+  <li><b>eval-power:</b> evaluates exponentiation operations first.</li>
+  <li><b>eval-mult:</b> evaluates multiplication operations after exponentiation.</li>
+  <li><b>eval-sum:</b> evaluates addition operations at the end.</li>
+  <li><b>solve:</b> connects all the previous functions and returns the final result.</li>
 </ul>
 
 <h3> Code </h3>
 
 ```racket
 
-(define (parse-expression expr)
-  (string-split expr "+"))
+(define (solve expression)
+  (if (valid-expression? expression)
+      (eval-sum
+       (eval-mult
+        (eval-power
+         (split-expression
+          (string->list expression)))))
+      "Invalid expression"))
 
-(define (sort-values values)
-  (sort values string<?))
-
-(define (build-expression values)
-  (string-join values "+"))
-
-(define (solve expr)
-  (build-expression
-   (sort-values
-    (parse-expression expr))))
 ```
     
-<h3> Explanation of the Functional Solution </h3>
-
 <p>
-The solution uses the functional paradigm because each part of the program is separated
-into functions. These functions are then composed to create the complete answer.
-</p>
-
-<p>
-The function <code>solve</code> shows this clearly, because it takes the original expression,
-parses it, sorts it, and then builds the final expression.
+The function <code>solve</code> shows the functional structure of the solution. It first
+checks if the expression is valid. If the expression is correct, it transforms the string
+into a list of elements and then evaluates the operations by priority.
 </p>
 
 <pre>
-solve = build-expression(
-                          sort-values(
-                                      parse-expression(input)))
+solve =
+  validate expression
+  -> split-expression
+  -> eval-power
+  -> eval-mult
+  -> eval-sum
 </pre>
 
 <p>
-This makes the logic easier to follow because every step has a specific purpose.
+This makes the logic easier to follow because every function has a specific purpose.
+Instead of solving the whole expression in one large block of code, the program separates
+the problem into smaller functional transformations.
 </p>
 
 <h2> Testing </h2>
@@ -146,23 +171,33 @@ different expressions.
 
 ```racket
 (define (run-tests)
-  (run-test "3+2+1" "1+2+3")
-  (run-test "1+1+3+2" "1+1+2+3")
-  (run-test "2" "2")
-  (run-test "3+3+2+1+1" "1+1+2+3+3")
-  (run-test "1+2+3" "1+2+3")
-  (run-test "2+1" "1+2")
+  ;; Casos validos correctos
+  (run-test "3+2*1^3" 5 #t)
+  (run-test "2+3*2" 8 #t)
+  (run-test "2^3+1" 9 #t)
+  (run-test "1+2+3" 6 #t)
+  (run-test "3*2+1" 7 #t)
+  (run-test "2^2*3+1" 13 #t)
 
-  ;; Pruebas incorrectas
-  (run-test "3+2+1" "3+2+1")
-  (run-test "2+1" "2+1"))
+  ;; Pruebas negativas
+  (run-test "3+2*1^3" 10 #f)
+  (run-test "2+3*2" 6 #f))
 ```
 
 <h3> Testing Interpretation</h3>
+
 <p>
-These tests are useful because they allow me to verify the program's correctness quickly
-without entering each input manually. They also help check important cases such as
-unordered expressions, repeated numbers, and already sorted inputs.
+The automated tests include valid cases, invalid cases, and negative cases. Valid cases
+verify that the program correctly evaluates expressions using operator precedence.
+Invalid cases check that the program rejects expressions with incorrect characters or
+incorrect structure.
+</p>
+
+<p>
+Negative tests intentionally use wrong expected outputs. These tests are useful because
+they confirm that the testing function can detect incorrect results. Therefore, a
+negative test is considered correct when the program identifies the expected output as
+false.
 </p>
 
 <h3> Testing Results </h3>
@@ -171,39 +206,41 @@ unordered expressions, repeated numbers, and already sorted inputs.
 After running the automated tests, the following results were obtained:
 </p>
 
-<img width="626" height="166" alt="Automated testing results" src="https://github.com/user-attachments/assets/178ce643-6dc0-4823-8332-22716daa20bc" />
+<img width="623" height="485" alt="imagen" src="https://github.com/user-attachments/assets/5c83022d-44c2-4d5c-aa9a-bca10e180da3" />
+
 <h2> Analysis </h2>
 
 <h3> Time Complexity </h3>
-
 <p>
-The program splits the expression, sorts the values, and joins them again.
+Let n be the number of characters or elements in the expression. The program
+processes the expression in several stages. First, it validates the expression. Then, it
+splits the expression into elements. After that, it evaluates the operators according to
+their precedence.
 </p>
 
 <ul>
-  <li>Splitting the expression takes <code>O(n)</code>.</li>
-  <li>Sorting the values takes <code>O(n log n)</code>.</li>
-  <li>Joining the final expression takes <code>O(n)</code>.</li>
+  <li>Validating the expression takes O(n) </li>
+  <li>Splitting the expression into elements takes O(n) </li>
+  <li>Evaluating exponentiation takes O(n) </li>
+  <li>Evaluating multiplication takes O(n) </li>
+  <li>Evaluating addition takes O(n) </li>
 </ul>
 
 <p>
-In this process, the most expensive operation in the functional solution is sorting. In general, efficient sorting algorithms require <code>O(n log n)</code> time, because the list is divided and reorganized while elements are compared. In this case, <code>n</code> represents the number of values in the expression.
+Since all these operations are linear and are executed one after another, the final time
+complexity is:
 </p>
 
-<p>
-Since sorting is the most expensive operation compared to splitting and joining,
-the final time complexity is:
-</p> 
-
 <pre>
-O(n log n)
+O(n)
 </pre>
 
 <h3> Space Complexity </h3>
 
 <p>
-The program stores the separated values in a list. Because this list depends on the
-amount of terms in the input, the space complexity is:
+The program stores the expression as a list of elements containing numbers and operators.
+Because this list grows depending on the size of the input expression, the space
+complexity is:
 </p>
 
 <pre>
